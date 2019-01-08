@@ -5,6 +5,12 @@ from common.libs.UrlManager import UrlManager
 app = Flask(__name__)
 app.register_blueprint(route_imooc,url_prefix="/imooc")
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
+from flask_sqlalchemy import SQLAlchemy
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:huang921118@127.0.0.1/author_book_py04"
+db = SQLAlchemy(app)
 
 @app.route("/")
 def hello_world():
@@ -23,6 +29,15 @@ def hello_world():
 @app.route("/api")
 def index():
     return "index page"
+
+@app.route("/api/hello")
+def hello():
+    from sqlalchemy import text
+    sql = "SELECT * FROM tbl_books"
+    result = db.engine.execute(sql)
+    for row in result:
+        app.logger.info(row)
+    return "Hello World"
 
 @app.errorhandler(404)
 def page_not_found(error):
